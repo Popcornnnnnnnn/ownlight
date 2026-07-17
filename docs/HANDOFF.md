@@ -18,6 +18,7 @@ Last updated: 2026-07-17
 - English `6.5-inch` screenshots 已进入 tracked public assets；iOS app 与 Share Extension 版本统一到 `1.1 (4)`。
 - 2026-07-17 已完成 App Store Connect `1.1 (4)` 提交：正式 archive/upload 成功；Primary Language 改为 `English (U.S.)`；English (U.S.) 保存 6 张英文截图；Social Media age-rating 新问题按无社交、无公开 UGC、无用户间 messaging 作答，结果仍为 `4+`；build `1.1 (4)` 已绑定；Review Notes 已刷新；当前状态为 `Waiting for Review`。
 - 2026-07-17 已发布公开源码仓库 `https://github.com/Popcornnnnnnnn/ownlight` 和 source-only GitHub Release `v1.1.0`。公开历史以审计后的 clean snapshot 为根，不包含 private repository 历史、owner signing material、IPA、本地配置或私有运行数据；MIT license、README、SECURITY、英文截图和 release docs 均已纳入。GitHub Actions 的 source 与 iOS jobs 已通过，其中 iOS job 使用 Xcode 16.4 验证公开 checkout，并为新版 Bluetooth/CloudKit SDK symbols 保留条件编译兼容。
+- 2026-07-17 公开仓库展示层完成第二次整理：README 改为 product-first 首页，首屏突出 App Store 下载、source release、CI 与许可证，6 张英文截图增加能力标题和说明，legacy server/admin 内容折叠为维护信息；App Store canonical URL 为 `https://apps.apple.com/app/id6778719728`。
 
 - CloudKit 第一阶段已关闭 `UAT-M017-CLOUDKIT-CROSS-DEVICE`：真实 iPhone/iPad 覆盖 ordinary text/audio/media sync、summary artifacts、comments、drafts、Settings preferences、check-ins、delete/tombstone、edit-media add/remove 和新语音 summary/comment 路径。
 - `iCloud Sync` 设置页已收敛为普通用户可理解的低频控制：account/status、toggle、guidance copy、`Sync Now`；smoke/default-zone/container diagnostics 不再作为普通设置项展示。

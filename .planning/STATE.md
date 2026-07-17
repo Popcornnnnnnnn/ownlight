@@ -15,8 +15,8 @@ Current Plan: 017-04
 Total Plans in Phase: 4
 Phase: 017 of 17 (M017 App Store Readiness And Product Maturity) — active on `main`
 Status: Active
-Last activity: 2026-07-17 — English App Store submission and public source release
-Last Activity Description: Build `1.1 (4)` was submitted with English primary metadata and six ordered English screenshots. The audited source snapshot was published to the new public `Popcornnnnnnnn/ownlight` repository as source-only release `v1.1.0`; GitHub Actions source and iOS jobs pass, including an Xcode 16.4 compatibility build. App Store Connect remains `Waiting for Review`.
+Last activity: 2026-07-17 — Public repository product-page refresh
+Last Activity Description: Build `1.1 (4)` remains submitted with English primary metadata and six ordered English screenshots. The audited source snapshot is live at `Popcornnnnnnnn/ownlight` as source-only release `v1.1.0`; GitHub Actions source and iOS jobs pass. The public README now leads with the App Store download, release/CI/license signals, six captioned English screenshots, privacy boundaries, and a clearer source-build path while folding legacy server/admin details into maintenance-only documentation.
 Progress: 100%
 
 ## Decisions Made

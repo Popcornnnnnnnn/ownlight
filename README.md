@@ -1,47 +1,69 @@
-# Ownlight
+<p align="center">
+  <img src="ios/PrivateMoments/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png" alt="Ownlight app icon" width="128">
+</p>
 
-Ownlight is a private, local-first personal timeline for iPhone.
+<h1 align="center">Ownlight</h1>
 
-[Download Ownlight on the App Store](https://apps.apple.com/app/id6778719728) or build it from source under the MIT License.
+<p align="center">
+  <strong>A private timeline with no audience.</strong><br>
+  Capture text, photos, audio, video, documents, and everyday check-ins without turning your life into a social feed.
+</p>
 
-The iOS app is the product: new moments are saved into this iPhone's local SQLite archive first, and the timeline remains usable without iCloud, a server, or network connection. iCloud / CloudKit is the current optional cross-device sync direction.
+<p align="center">
+  <a href="https://apps.apple.com/app/id6778719728"><img src="https://img.shields.io/badge/App_Store-Download-0D96F6?style=for-the-badge&logo=apple&logoColor=white" alt="Download Ownlight on the App Store"></a>
+  <a href="https://github.com/Popcornnnnnnnn/ownlight/releases/latest"><img src="https://img.shields.io/github/v/release/Popcornnnnnnnn/ownlight?style=for-the-badge&label=Source" alt="Latest Ownlight source release"></a>
+</p>
 
-Ownlight is meant for personal archives, not social sharing. It supports text, photos, audio, video, document attachments, comments, favorites, smart tags, check-ins, calendar review, Share Sheet import, local archive export, empty-library local archive import, offline retry, opt-in iCloud sync, and iPhone-direct AI summaries/reviews through user-configured providers.
+<p align="center">
+  <a href="https://github.com/Popcornnnnnnnn/ownlight/actions/workflows/verify.yml"><img src="https://github.com/Popcornnnnnnnn/ownlight/actions/workflows/verify.yml/badge.svg" alt="Verification status"></a>
+  <img src="https://img.shields.io/badge/iOS-17%2B-black?logo=apple" alt="iOS 17 or later">
+  <img src="https://img.shields.io/badge/SwiftUI-native-F05138?logo=swift&logoColor=white" alt="Native SwiftUI app">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License"></a>
+</p>
+
+<p align="center">
+  <a href="https://apps.apple.com/app/id6778719728">App Store</a> ·
+  <a href="https://private-moments.popcornnn.xyz">Privacy &amp; Support</a> ·
+  <a href="https://github.com/Popcornnnnnnnn/ownlight/releases/latest">Source Release</a>
+</p>
+
+## Why Ownlight
+
+Ownlight sits between a social timeline and a traditional journal. Posting feels lightweight, but everything is for you: no followers, public comments, engagement counters, ads, or pressure to perform.
+
+| | |
+| --- | --- |
+| **Local first** | New moments are written to the iPhone's local SQLite archive first. Capture, browse, and search still work without a network connection. |
+| **Private by design** | Ownlight has no developer-hosted account system or social graph. Optional iCloud sync uses the user's private CloudKit database. |
+| **Rich moments** | Record text, photos, audio, video, PDFs, comments, favorites, pins, smart tags, check-ins, and Share Sheet imports. |
+| **Reflection, not gamification** | Calendar review, weekly review, memories, search, topic areas, and Markdown help you revisit what mattered. |
+| **Bring your own AI** | AI is optional and user-configured. Provider API keys stay in the iPhone Keychain and are excluded from iCloud sync and exports. |
+| **Open source** | The public source is MIT licensed. GitHub releases are source-only; signed App Store builds are distributed by Apple. |
 
 ## Screenshots
 
-<p>
-  <img src="docs/assets/screenshots/app-store-en/01-ownlight-timeline-en.png" alt="Ownlight private timeline" width="260">
-  <img src="docs/assets/screenshots/app-store-en/02-ai-summary-en.png" alt="Ownlight optional AI summary" width="260">
-  <img src="docs/assets/screenshots/app-store-en/03-markdown-detail-en.png" alt="Ownlight Markdown moment detail" width="260">
-</p>
+<table>
+  <tr>
+    <td align="center"><strong>Private timeline</strong><br><img src="docs/assets/screenshots/app-store-en/01-ownlight-timeline-en.png" alt="Ownlight private timeline" width="260"><br><sub>Capture everyday moments without an audience.</sub></td>
+    <td align="center"><strong>Optional AI summaries</strong><br><img src="docs/assets/screenshots/app-store-en/02-ai-summary-en.png" alt="Ownlight optional AI summary" width="260"><br><sub>Turn long voice notes into structured reflections.</sub></td>
+    <td align="center"><strong>Markdown details</strong><br><img src="docs/assets/screenshots/app-store-en/03-markdown-detail-en.png" alt="Ownlight Markdown moment detail" width="260"><br><sub>Keep longer thoughts readable and expressive.</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Calendar review</strong><br><img src="docs/assets/screenshots/app-store-en/04-calendar-review-en.png" alt="Ownlight calendar review" width="260"><br><sub>Look back by day, week, and month.</sub></td>
+    <td align="center"><strong>Topic areas</strong><br><img src="docs/assets/screenshots/app-store-en/05-topic-areas-en.png" alt="Ownlight topic areas" width="260"><br><sub>Browse AI-assisted topics without a tag wall.</sub></td>
+    <td align="center"><strong>Private iCloud sync</strong><br><img src="docs/assets/screenshots/app-store-en/06-icloud-sync-en.png" alt="Ownlight optional iCloud sync" width="260"><br><sub>Keep your own Apple devices in sync when enabled.</sub></td>
+  </tr>
+</table>
 
-<p>
-  <img src="docs/assets/screenshots/app-store-en/04-calendar-review-en.png" alt="Ownlight calendar review" width="260">
-  <img src="docs/assets/screenshots/app-store-en/05-topic-areas-en.png" alt="Ownlight topic areas" width="260">
-  <img src="docs/assets/screenshots/app-store-en/06-icloud-sync-en.png" alt="Ownlight optional iCloud sync" width="260">
-</p>
+The screenshots use deterministic demo data and contain no private user content.
 
-The tracked screenshots use deterministic demo data and contain no private user content. To regenerate them for UI work:
+## Get Ownlight
 
-```bash
-npm run ios:simulator:demo
-```
+### App Store
 
-The demo fixture is opt-in and only runs when the app is launched with `--private-moments-demo-data`. It writes deterministic local posts, tags, comments, AI-summary metadata, media placeholders, and check-ins into the simulator database. The normal app path never seeds demo data.
+[Download Ownlight on the App Store](https://apps.apple.com/app/id6778719728). The store build is free and contains no ads, subscription, or in-app purchase.
 
-- [PRD](docs/PRD.md)
-- [Technical Design](docs/TECH-DESIGN.md)
-- [Integration Guide](docs/INTEGRATION-GUIDE.md)
-- [Operator Runbook](docs/OPERATOR-RUNBOOK.md)
-- [Networking](docs/NETWORKING.md)
-- [Workflow](docs/WORKFLOW.md)
-- [Handoff](docs/HANDOFF.md)
-- [Design Principles](docs/DESIGN-PRINCIPLES.md)
-- [Release Checklist](docs/RELEASE-CHECKLIST.md)
-- [Open Source Readiness](docs/OPEN-SOURCE-READINESS.md)
-
-## Development
+### Build from source
 
 Requirements:
 
@@ -49,75 +71,71 @@ Requirements:
 - iOS 17 or later.
 - Node.js 22 or later.
 - [XcodeGen](https://github.com/yonaskolb/XcodeGen).
-
-Install dependencies:
+- Your own Apple Developer signing identity for device builds, App Groups, and CloudKit.
 
 ```bash
+git clone https://github.com/Popcornnnnnnnn/ownlight.git
+cd ownlight
 npm install
-```
-
-Low-impact iOS verification, which avoids launching Simulator and limits Xcode build parallelism:
-
-```bash
 npm run verify:ios:low-impact
 ```
 
-Install and launch on the paired iPhone:
-
-```bash
-npm run ios:device
-```
-
-Optional setup flags remain available for legacy service work:
-
-```bash
-npm run setup:local -- --with-ai
-npm run setup:local -- --with-ios
-```
-
-`--with-ai` prepares the optional transcription helper environment. `--with-ios` regenerates the Xcode project with `xcodegen`.
-
-## iOS App
-
-Run Simulator only when visual UI review or screenshots are required:
-
-```bash
-npm run ios:simulator
-```
-
-Run the simulator with reusable demo data for screenshots and UI review:
-
-```bash
-npm run ios:simulator:demo
-```
-
-After Simulator work, shut down old simulator state to reduce Mac memory and WindowServer pressure:
-
-```bash
-npm run ios:simulator:cleanup
-```
-
-The normal app can be used as a standalone iPhone archive. If you opt into iCloud, enable `Settings > Data Storage > iCloud > iCloud Sync` after confirming the account/container state.
-
-For machine-specific device, signing, bundle identifier, App Group, and remote URL settings:
+For machine-specific signing, device, bundle identifier, App Group, and CloudKit overrides:
 
 ```bash
 cp .env.local.example .env.local
 ```
 
-`npm run ios:simulator` and `npm run ios:device` read `.env.local` and generate an ignored `ios/Config/Local.xcconfig` for local iOS overrides.
+Install and launch on a paired iPhone:
 
-The iOS app stores local posts, comments, tags, generated AI artifact metadata, compressed images, audio/video/document media, posters, Share Extension imports, drafts, and compatibility sync state under the app's Application Support or App Group directories. Audio/video AI starts with a private local transcript on the iPhone, then uses the text-analysis provider configured in Settings > AI & Analysis. Provider API keys stay in the iPhone Keychain and are not included in iCloud sync, export packages, or legacy server storage. Settings is organized around `This iPhone`, `iCloud`, `Storage & Export`, `AI & Analysis`, tags, and app preferences.
+```bash
+npm run ios:device
+```
 
-`Storage & Export` can export a local archive zip and can import that zip back into an empty local iPhone library. Import is a restore drill, not a merge or overwrite tool: it refuses to run when local posts, media, comments, custom tags, check-ins, AI summaries, or outbox operations already exist, and it does not restore API keys or private transcript text.
+No pre-signed IPA is published. GitHub releases contain source code only so each developer keeps control of their own signing and CloudKit identity.
 
-After iOS code changes on the integration branch, rebuild and reinstall to the real device with `npm run ios:device`. For non-visual work, prefer `npm run verify:ios:low-impact` or focused tests first; use Simulator only for screenshot-backed UI review.
+## Privacy Model
 
-## Legacy Server And Admin Workspaces
+- **On-device by default:** moments, comments, tags, drafts, media, and generated artifacts live in the app's local archive first.
+- **Optional iCloud:** enable `Settings > Data Storage > iCloud > iCloud Sync` to sync through the private CloudKit database of the signed-in Apple Account.
+- **Optional external AI:** Ownlight sends the minimum required content only after the user configures a compatible provider and enables the relevant AI workflow.
+- **Local credentials:** provider API keys stay in the iPhone Keychain. They are not included in iCloud sync, archive exports, or the legacy server workspace.
+- **Portable archive:** `Storage & Export` can create a local archive and restore it into an empty Ownlight library.
 
-The repository still contains `server/` and `admin/` for historical compatibility, API contract reference, archive tooling, and maintenance experiments. They are not required for ordinary iPhone-first use or current iCloud sync work.
+See [Security And Privacy](SECURITY.md) for the public security boundary and responsible disclosure path.
 
-Manual legacy setup:
+## Repository Map
+
+| Path | Purpose |
+| --- | --- |
+| `ios/PrivateMoments` | The SwiftUI iPhone/iPad app distributed as Ownlight. |
+| `ios/PrivateMoments/CloudKit` | Optional private CloudKit cross-device sync. |
+| `ios/ShareExtension` | Share Sheet capture into the main app composer. |
+| `docs/` | Product, architecture, operations, privacy, and release documentation. |
+| `site/` | Static Privacy Policy and Support pages. |
+| `server/`, `admin/` | Legacy compatibility and maintenance workspaces; not required for normal Ownlight use. |
+
+## Development
+
+Low-impact iOS verification avoids launching Simulator and limits Xcode build parallelism:
+
+```bash
+npm run verify:ios:low-impact
+```
+
+Run Simulator only for visual UI review or screenshot work:
+
+```bash
+npm run ios:simulator:demo
+npm run ios:simulator:cleanup
+```
+
+The demo fixture is opt-in and only runs with `--private-moments-demo-data`. It seeds deterministic local moments, tags, comments, AI-summary metadata, media placeholders, and check-ins. The normal app path never seeds demo data.
+
+<details>
+<summary><strong>Legacy server and Admin workspace</strong></summary>
+
+The repository retains `server/` and `admin/` for historical compatibility, API reference, archive tooling, and maintenance experiments. They are not part of the ordinary iPhone-first product runtime and are not required for iCloud sync.
 
 ```bash
 cp server/.env.example server/.env
@@ -128,65 +146,25 @@ npm run server:build
 npm run server:dev
 ```
 
-Before first legacy server start, set `PRIVATE_MOMENTS_INITIAL_PASSWORD` in `server/.env`. This password is only used to create the first local user when the database has no users.
+The legacy server defaults to `http://127.0.0.1:3210`; after the Admin build, the maintenance UI is available at `http://127.0.0.1:3210/admin/`. See the [Operator Runbook](docs/OPERATOR-RUNBOOK.md) for archive, restic, launchd, and recovery details.
 
-The legacy server defaults to:
+</details>
 
-```text
-http://127.0.0.1:3210
-```
+## Documentation
 
-After `npm run admin:build`, the legacy Admin UI is served at:
+- [Product Requirements](docs/PRD.md)
+- [Technical Design](docs/TECH-DESIGN.md)
+- [Design Principles](docs/DESIGN-PRINCIPLES.md)
+- [Operator Runbook](docs/OPERATOR-RUNBOOK.md)
+- [Integration Guide](docs/INTEGRATION-GUIDE.md)
+- [Workflow](docs/WORKFLOW.md)
+- [Release Checklist](docs/RELEASE-CHECKLIST.md)
+- [Open Source Readiness](docs/OPEN-SOURCE-READINESS.md)
+- [Changelog](CHANGELOG.md)
 
-```text
-http://127.0.0.1:3210/admin/
-```
+## Contributing And Releases
 
-The Admin `Archive` tab can configure a restic backup repository, create a project-managed `.private-moments-restic-key`, run manual or scheduled daily backups, list/check snapshots, restore a snapshot into a staged directory, and prepare a verified restore for promotion. Treat this as a maintenance path, not the current product default; see [Operator Runbook](docs/OPERATOR-RUNBOOK.md) for the repository/key security semantics and recovery steps.
-
-### launchd
-
-Install the Mac login service:
-
-```bash
-server/scripts/install-launchd.sh
-```
-
-Uninstall it:
-
-```bash
-server/scripts/uninstall-launchd.sh
-```
-
-The default production data directory is:
-
-```text
-~/Library/Application Support/PrivateMoments
-```
-
-For local development, set `PRIVATE_MOMENTS_DATA_DIR` to avoid writing to the production directory.
-
-The server soft-deletes posts first, then permanently removes expired deleted posts and media files after 30 days. Cleanup runs once on server startup and then every 6 hours while the service is running.
-
-## Smoke Test
-
-Legacy server smoke:
-
-```bash
-curl http://127.0.0.1:3210/api/v1/health
-
-curl -X POST http://127.0.0.1:3210/api/v1/auth/login \
-  -H 'Content-Type: application/json' \
-  -d '{"password":"your-password","deviceName":"Dev iPhone","platform":"ios"}'
-```
-
-For route details, admin filters, sync payloads, and media batch download examples, see [Integration Guide](docs/INTEGRATION-GUIDE.md).
-
-## Release
-
-Ownlight is available on the App Store and the source is published under the MIT License. GitHub releases are source releases; Apple signing, bundle identifiers, App Groups, and CloudKit containers remain tied to each developer's own Apple Developer account.
-
-Before publishing a new build or source tag, run:
+Issues and focused pull requests are welcome; start with [CONTRIBUTING.md](CONTRIBUTING.md). Before publishing a source tag or App Store build, run:
 
 ```bash
 npm run doctor:release
@@ -195,4 +173,4 @@ npm run verify:ios:low-impact
 git diff --check
 ```
 
-See [Changelog](CHANGELOG.md), [Release Checklist](docs/RELEASE-CHECKLIST.md), [Open Source Readiness](docs/OPEN-SOURCE-READINESS.md), and [Security And Privacy](SECURITY.md).
+Ownlight is available under the [MIT License](LICENSE).
