@@ -8,7 +8,7 @@ Last updated: 2026-07-17
 
 - 当前阶段：M017 App Store Readiness And Product Maturity。
 - 当前产品形态：iPhone local-first 私密时间线；本机 SQLite 是默认 source of truth；`iCloud Sync` 是 opt-in CloudKit private database 同步层。
-- App Store `1.0 (3)` 已发布；English-first `1.1 (4)` 已提交并处于 `Waiting for Review`。当前剩余 release checkpoint 是把 clean source snapshot 发布到新的 public GitHub repository。
+- App Store `1.0 (3)` 已发布；English-first `1.1 (4)` 已提交并处于 `Waiting for Review`。Clean source snapshot 和 source-only `v1.1.0` GitHub Release 已发布；当前剩余 release checkpoint 是审核通过后的 manual release 与 App Store 安装版 smoke。
 - 第一版无账号、无注册、无登录、无 IAP、无广告、无第三方 analytics；AI 走用户自选 provider / endpoint。
 - Mac server/admin 仍作为 legacy 兼容、归档、诊断和 API 参考保留，不是普通用户默认 runtime。
 
@@ -17,6 +17,7 @@ Last updated: 2026-07-17
 - 2026-07-17 已冻结双发布策略：现有 private development repository 保持 private；公开源码使用新的 `Popcornnnnnnnn/ownlight` clean-history repository，GitHub Release 只发 source，不发 owner-signed IPA。
 - English `6.5-inch` screenshots 已进入 tracked public assets；iOS app 与 Share Extension 版本统一到 `1.1 (4)`。
 - 2026-07-17 已完成 App Store Connect `1.1 (4)` 提交：正式 archive/upload 成功；Primary Language 改为 `English (U.S.)`；English (U.S.) 保存 6 张英文截图；Social Media age-rating 新问题按无社交、无公开 UGC、无用户间 messaging 作答，结果仍为 `4+`；build `1.1 (4)` 已绑定；Review Notes 已刷新；当前状态为 `Waiting for Review`。
+- 2026-07-17 已发布公开源码仓库 `https://github.com/Popcornnnnnnnn/ownlight` 和 source-only GitHub Release `v1.1.0`。公开历史以审计后的 clean snapshot 为根，不包含 private repository 历史、owner signing material、IPA、本地配置或私有运行数据；MIT license、README、SECURITY、英文截图和 release docs 均已纳入。GitHub Actions 的 source 与 iOS jobs 已通过，其中 iOS job 使用 Xcode 16.4 验证公开 checkout，并为新版 Bluetooth/CloudKit SDK symbols 保留条件编译兼容。
 
 - CloudKit 第一阶段已关闭 `UAT-M017-CLOUDKIT-CROSS-DEVICE`：真实 iPhone/iPad 覆盖 ordinary text/audio/media sync、summary artifacts、comments、drafts、Settings preferences、check-ins、delete/tombstone、edit-media add/remove 和新语音 summary/comment 路径。
 - `iCloud Sync` 设置页已收敛为普通用户可理解的低频控制：account/status、toggle、guidance copy、`Sync Now`；smoke/default-zone/container diagnostics 不再作为普通设置项展示。
@@ -80,7 +81,7 @@ npm run verify:server
 npm run doctor:archive
 ```
 
-如未来重新考虑公开源码：
+每次公开源码发布：
 
 ```bash
 npm run doctor:release

@@ -233,6 +233,8 @@ npm run doctor:release
 
 `doctor:release` 只覆盖当前 checkout。公开仓库必须从当前已审计 tree 创建 clean history，不能把 private development repository 的旧提交和 backup branches 一起公开。
 
+2026-07-17 已完成首个公开 checkpoint：`https://github.com/Popcornnnnnnnn/ownlight` 为 public，`v1.1.0` 为 MIT source-only GitHub Release，不包含 IPA 或 owner signing material。公开仓库 GitHub Actions 的 source 与 iOS jobs 均通过，iOS job 覆盖 Xcode 16.4 generic-device build。
+
 ## 当前结论
 
-截至 2026-07-17，`1.0 (3)` 已发布并在海外 174 个国家或地区可用，China mainland `Not Available`。CloudKit 第一阶段和真实 iPhone/iPad UAT 已关闭。English-first `1.1 (4)` 已上传、绑定并提交 App Review，当前为 `Waiting for Review`。公开源码使用新的 `Popcornnnnnnnn/ownlight` clean-history repository；现有 `Popcornnnnnnnn/private-moments` 保持 private。公开发布版本为 `v1.1.0`，只发布 source，不上传 owner-signed IPA。两条发布线都必须通过 `doctor:release`、`doctor:app-store`、`verify:ios:low-impact` 和 `git diff --check`。
+截至 2026-07-17，`1.0 (3)` 已发布并在海外 174 个国家或地区可用，China mainland `Not Available`。CloudKit 第一阶段和真实 iPhone/iPad UAT 已关闭。English-first `1.1 (4)` 已上传、绑定并提交 App Review，当前为 `Waiting for Review`。公开源码已在新的 `Popcornnnnnnnn/ownlight` clean-history repository 发布；现有 `Popcornnnnnnnn/private-moments` 保持 private。公开版本 `v1.1.0` 只发布 source，不上传 owner-signed IPA，GitHub Actions source/iOS jobs 均为绿色。当前剩余发布动作是监控 App Review、批准后 manual release，并验证 App Store 安装版本。

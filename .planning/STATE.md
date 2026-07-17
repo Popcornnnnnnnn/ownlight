@@ -4,7 +4,7 @@
 
 这是当前仓库的结构化状态页。后续项目状态以 `.planning/STATE.md` 为准；旧 GSD 规划树已从 active checkout 移除，边界见 `.planning/LEGACY-GSD-ARCHIVE.md`。
 
-**Current focus:** M017 App Store Readiness And Product Maturity is in release closeout. App Store `1.0 (3)` is live outside China mainland, and English-first `1.1 (4)` is `Waiting for Review`. The remaining checkpoint is a clean-history public source release at `Popcornnnnnnnn/ownlight`. The existing `Popcornnnnnnnn/private-moments` development repository stays private. Product behavior remains local-first with opt-in iCloud Sync and user-configured AI.
+**Current focus:** M017 App Store Readiness And Product Maturity is in release closeout. App Store `1.0 (3)` is live outside China mainland, English-first `1.1 (4)` is `Waiting for Review`, and the clean-history public source release is live at `Popcornnnnnnnn/ownlight`. The existing `Popcornnnnnnnn/private-moments` development repository stays private. The remaining release work is App Review monitoring, manual App Store release after approval, and an App Store install smoke. Product behavior remains local-first with opt-in iCloud Sync and user-configured AI.
 
 ## Current Position
 
@@ -16,7 +16,7 @@ Total Plans in Phase: 4
 Phase: 017 of 17 (M017 App Store Readiness And Product Maturity) — active on `main`
 Status: Active
 Last activity: 2026-07-17 — English App Store submission and public source release
-Last Activity Description: Build `1.1 (4)` was archived, uploaded, bound to the version, switched to English primary metadata with six ordered English screenshots, and submitted to App Review. App Store Connect now reports `Waiting for Review`; clean-history GitHub publication remains the final release action.
+Last Activity Description: Build `1.1 (4)` was submitted with English primary metadata and six ordered English screenshots. The audited source snapshot was published to the new public `Popcornnnnnnnn/ownlight` repository as source-only release `v1.1.0`; GitHub Actions source and iOS jobs pass, including an Xcode 16.4 compatibility build. App Store Connect remains `Waiting for Review`.
 Progress: 100%
 
 ## Decisions Made
@@ -99,11 +99,11 @@ Progress: 100%
 
 ## Blockers
 
-- Open-source release is active and uses a clean snapshot rather than private repository history. The release must exclude signing artifacts, local overrides, credentials, private runtime data, and `.planning/phases/`; GitHub Release remains source-only.
+- Open-source release `v1.1.0` is live at `Popcornnnnnnnn/ownlight` from a clean snapshot rather than private repository history. It excludes signing artifacts, local overrides, credentials, private runtime data, and `.planning/phases/`; the GitHub Release is source-only and its source/iOS CI is green.
 - M017 当前重点是发布后监控 Ownlight v1 的 App Store listing 和首个 App Store 安装版本 smoke。单机 iPhone 仍是 baseline；CloudKit private sync 第一阶段已经关闭 UAT gate。Apple Developer release App IDs、App Group、iCloud container、Debug 真机签名安装、真实 iPhone/iPad guarded smoke、普通 Moment/media/comment/summary/tag/check-in/draft/preference sync、delete/tombstone、edit-media add/remove、用户可读 failure messages、secrets/provider config exclusion spot-check、container count/queue/SQLite health 检查，以及一次性 full reconciliation 自愈机制均已进入当前 checkpoint。`npm run doctor:app-store` 覆盖源代码层面的上架/隐私 preflight，并在 2026-06-24 后禁止首发版声明 `UIBackgroundModes = audio`。2026-06-11 已上传并选择 App Store build `1.0 (2)`，App Privacy 已发布为 `Data Not Collected`；2026-06-21 已完成 Age Rating `4+`、free pricing、China mainland-only availability、Mac/Vision distribution off、iPhone `6.5" Display` screenshots `6 of 10` 上传，并在 owner 确认后提交审核；2026-06-24 审核被 Guideline 2.5.4 打回，同日 build `1.0 (3)` 已上传、切换为当前审核 build，并重新提交；2026-06-25 build `1.0 (3)` 被 Guideline 3.1.1 打回，2026-06-27 已在 App Store Connect 回复澄清，Apple 随后接受并批准；2026-06-28 22:35 CST 已手动发布，App Store Connect 状态为 `1.0 Ready for Distribution`；2026-07-02 已从 China mainland-only 改为 174 countries/regions 可用、China mainland `Not Available`，变更预计 24 小时内生效。Push-assisted near-realtime sync 记录在 Backlog B002，不作为当前 CloudKit 发布门禁。
 
 ## Session
 
 Last Date: 2026-07-17
-Stopped at: Ownlight iOS `1.1 (4)` is `Waiting for Review` with English (U.S.) as Primary Language and six ordered English screenshots. The next action is publishing the audited clean-history source snapshot and `v1.1.0` source-only GitHub Release at `Popcornnnnnnnn/ownlight`, then monitoring App Review.
+Stopped at: Ownlight iOS `1.1 (4)` is `Waiting for Review` with English (U.S.) as Primary Language and six ordered English screenshots. The audited clean-history source snapshot and source-only `v1.1.0` GitHub Release are live at `Popcornnnnnnnn/ownlight` with green source/iOS CI. The next action is monitoring App Review, manually releasing after approval, and running an App Store install smoke.
 Resume File: docs/APP-STORE-READINESS.md
