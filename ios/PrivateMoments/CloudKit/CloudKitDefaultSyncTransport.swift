@@ -465,8 +465,10 @@ enum CloudKitErrorDescription {
             return "assetNotAvailable"
         case .accountTemporarilyUnavailable:
             return "accountTemporarilyUnavailable"
+#if compiler(>=6.2)
         case .participantAlreadyInvited:
             return "participantAlreadyInvited"
+#endif
         @unknown default:
             return "unknownCloudKitCode"
         }
