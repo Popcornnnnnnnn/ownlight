@@ -1,0 +1,60 @@
+{
+  "name": "private-moments",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Private, local-first personal timeline for iOS with optional iCloud sync.",
+  "workspaces": [
+    "server",
+    "admin",
+    "transcription-gateway"
+  ],
+  "scripts": {
+    "postinstall": "npm run server:prisma:generate",
+    "setup:local": "scripts/setup-local.sh",
+    "admin:dev": "npm run dev -w admin",
+    "admin:build": "npm run build -w admin",
+    "admin:preview": "npm run preview -w admin",
+    "server:dev": "npm run dev -w server",
+    "server:build": "npm run build -w server",
+    "server:start": "npm run start -w server",
+    "server:typecheck": "npm run typecheck -w server",
+    "server:test": "npm run test -w server",
+    "server:prisma:generate": "npm run prisma:generate -w server",
+    "server:prisma:migrate": "npm run prisma:migrate -w server",
+    "server:prisma:deploy": "npm run prisma:deploy -w server",
+    "gateway:dev": "npm run dev -w transcription-gateway",
+    "gateway:build": "npm run build -w transcription-gateway",
+    "gateway:start": "npm run start -w transcription-gateway",
+    "gateway:typecheck": "npm run typecheck -w transcription-gateway",
+    "gateway:test": "npm run test -w transcription-gateway",
+    "site:test": "node --test site/app-store-pages.test.mjs",
+    "verify:server": "npm run server:typecheck && npm run server:test && npm run server:build && npm run admin:build",
+    "verify:ios:generic": "bash scripts/verify-ios-generic.sh",
+    "verify:ios:low-impact": "bash scripts/verify-ios-low-impact.sh",
+    "verify:uat-gates": "node scripts/verify-uat-gates.mjs",
+    "verify:release-gates": "node scripts/verify-uat-gates.mjs --strict",
+    "verify:all": "bash scripts/verify-all.sh",
+    "smoke:admin": "node scripts/smoke-admin-maintenance.mjs",
+    "doctor:runtime": "node scripts/doctor-runtime.mjs",
+    "doctor:sync": "node scripts/doctor-sync.mjs",
+    "doctor:archive": "node scripts/archive-drill.mjs",
+    "doctor:ai": "node scripts/ai-eval.mjs",
+    "doctor:app-store": "node scripts/doctor-app-store.mjs",
+    "doctor:app-store:test": "node --test scripts/doctor-app-store.test.mjs",
+    "doctor:release": "node scripts/open-source-scan.mjs",
+    "doctor:all": "npm run doctor:runtime && npm run doctor:sync && npm run doctor:archive && npm run doctor:ai && npm run doctor:app-store && npm run doctor:release",
+    "ios:simulator": "scripts/run-ios-simulator.sh",
+    "ios:simulator:demo": "PRIVATE_MOMENTS_SIM_DEMO_DATA=1 scripts/run-ios-simulator.sh",
+    "ios:simulator:cleanup": "xcrun simctl shutdown all >/dev/null 2>&1 || true; osascript -e 'tell application \"Simulator\" to quit' >/dev/null 2>&1 || true",
+    "ios:preflight": "node scripts/preflight-ios-device.mjs",
+    "ios:preflight:test": "node --test scripts/preflight-ios-device.test.mjs",
+    "ios:device": "scripts/run-ios-device.sh",
+    "ios:device:uat": "scripts/run-ios-device-uat.sh"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "overrides": {
+    "esbuild": "0.28.1"
+  }
+}

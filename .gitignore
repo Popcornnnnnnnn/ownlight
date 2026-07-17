@@ -1,0 +1,65 @@
+node_modules/
+dist/
+.env
+.DS_Store
+*.log
+.tmp
+.tmp/
+
+# iOS/Xcode generated output
+ios/PrivateMoments.xcodeproj/
+ios/build/
+ios/build-*/
+ios/Config/Local.xcconfig
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# Local development databases
+server/dev.db
+server/dev.db-*
+server/prisma/dev.db
+server/prisma/dev.db-*
+
+# Runtime data
+data/
+
+# Agent/runtime state
+.bg-shell/
+.planning/_legacy-gsd/activity/
+.planning/_legacy-gsd/audit/
+.planning/_legacy-gsd/exec/
+.planning/_legacy-gsd/journal/
+.planning/_legacy-gsd/runtime/
+.planning/_legacy-gsd/event-log.jsonl
+.planning/_legacy-gsd/notifications.jsonl
+.planning/_legacy-gsd/gsd.db
+.planning/_legacy-gsd/gsd.db-shm
+.planning/_legacy-gsd/gsd.db-wal
+.planning/_legacy-gsd/metrics.json
+.planning/_legacy-gsd/state-manifest.json
+
+# ── GSD baseline (auto-generated) ──
+.gsd-id
+.mcp.json
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.code-workspace
+.env.*
+!.env.example
+!.env.local.example
+.next/
+build/
+__pycache__/
+*.pyc
+.venv/
+venv/
+target/
+vendor/
+coverage/
+.cache/
+tmp/

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ownlight 隐私政策</title>
+    <meta name="description" content="Ownlight 隐私政策。">
+    <link rel="stylesheet" href="../../styles.css">
+  </head>
+  <body>
+    <main class="page legal">
+      <p class="eyebrow">Ownlight</p>
+      <h1>Ownlight 隐私政策</h1>
+      <p class="updated">最后更新：2026 年 6 月 2 日</p>
+
+      <section>
+        <h2>无需账号</h2>
+        <p>
+          Ownlight 第一版 App Store 版本不要求账号、注册、登录、订阅、App 内购买或广告。这个 App 面向单个用户，用来在自己的设备上保存私人时间线。
+        </p>
+      </section>
+
+      <section>
+        <h2>无跟踪或第三方分析</h2>
+        <p>
+          第一版 App Store 版本不包含广告 SDK、第三方分析 SDK、跨 App 跟踪，也不提供开发者运营的用户账号系统。Ownlight 不出售个人数据。
+        </p>
+      </section>
+
+      <section>
+        <h2>本地优先存储</h2>
+        <p>
+          你的 moments、评论、标签、check-ins、生成摘要和媒体会先保存在 iPhone 本机。这个 App 的设计目标是在不登录开发者运营服务的情况下也能使用。
+        </p>
+      </section>
+
+      <section>
+        <h2>我们处理的数据</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>数据</th>
+                <th>数据如何收集</th>
+                <th>存储位置</th>
+                <th>数据如何使用</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Moments、评论、标签、check-ins、收藏、置顶和搜索元数据</td>
+                <td>由你在 App 中创建、编辑、导入或整理。</td>
+                <td>优先存储在你的 iPhone 本机。如果提交版本启用了 iCloud Sync，也可能存储在你的 private iCloud database 中。</td>
+                <td>用于显示时间线、日历、搜索、筛选、标签、check-ins 和个人回顾。</td>
+              </tr>
+              <tr>
+                <td>照片、视频、音频、文档、缩略图和时长元数据</td>
+                <td>由你拍摄、选择、录音、扫描或导入文件，也可能来自 iOS Share Sheet。</td>
+                <td>优先存储在你的 iPhone 本机。如果提交版本启用了 iCloud Sync，相关媒体也可能存储在你的 private iCloud database 中。</td>
+                <td>用于给 moment 添加媒体、播放、预览、导出，并在启用同步时让你自己的设备访问同一份档案。</td>
+              </tr>
+              <tr>
+                <td>AI 生成的摘要、标题、标签、转录文本、回顾和 token usage metadata</td>
+                <td>仅在你启用并使用 AI 功能时生成。</td>
+                <td>生成结果保存在 iPhone 本机。Provider credentials 保存在 iPhone Keychain 中。</td>
+                <td>用于帮助总结音频、视频、文本或个人回顾内容，并整理你的档案。</td>
+              </tr>
+              <tr>
+                <td>设置、provider endpoint、model names、同步偏好和诊断状态</td>
+                <td>由你配置，或由 App 记录本地运行状态。</td>
+                <td>保存在你的 iPhone 本机。API keys 和 provider secrets 保存在 iPhone Keychain 中。</td>
+                <td>用于运行你启用的功能、记住偏好，并帮助诊断本地同步或导出问题。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2>数据共享边界</h2>
+        <p>
+          Ownlight 第一版 App Store 版本不会把你的时间线发送到开发者运营的账号服务。只有当你主动选择需要离开 iPhone 的功能时，数据才可能离开设备，例如 iCloud Sync、导出、分享，或你自行配置的 AI provider。
+        </p>
+      </section>
+
+      <section>
+        <h2>可选 AI 和自带服务提供方</h2>
+        <p>
+          AI 功能是可选的。如果你启用 AI，你需要自己选择 provider、endpoint、model 和 API key。Ownlight 第一版不提供开发者托管的默认 AI 服务。
+        </p>
+        <p>
+          启用 AI 后，为了生成摘要、标题、标签、回顾或转录，所需内容可能会发送到你配置的 provider 或 endpoint。该 provider 会按照自己的隐私政策和条款处理这些内容。只有在你接受该 provider 的数据处理方式时，才应启用 AI。
+        </p>
+        <p>
+          Ownlight 无法控制你选择的 provider 是否保存输入、是否用于训练，或是否支持删除请求。启用 AI 前，请先阅读该 provider 的隐私条款。
+        </p>
+      </section>
+
+      <section>
+        <h2>iCloud Sync</h2>
+        <p>
+          iCloud Sync 可用时是可选功能。如果提交版本启用了该功能，你的 moments 和相关媒体可能存储在你的 private iCloud database 中，以便你自己的设备访问同一份档案。AI provider keys 和 secrets 应保留在每台设备本机。
+        </p>
+      </section>
+
+      <section>
+        <h2>导出</h2>
+        <p>
+          导出文件可能包含私密文本、评论、标签、摘要、回顾、check-ins 和媒体。导出包用于你自己的备份和迁移检查。请把导出文件保存在可信位置，并在不再需要时自行删除。
+        </p>
+      </section>
+
+      <section>
+        <h2>撤回同意</h2>
+        <p>
+          你可以关闭 AI 功能或移除已配置的 provider credentials，从而停止未来的 AI 处理。如果你的版本提供 iCloud Sync，你可以关闭 iCloud Sync 来停止未来同步。你也可以在 iOS 设置中拒绝或撤销照片、相机、麦克风和本地网络等权限。
+        </p>
+      </section>
+
+      <section>
+        <h2>保留期限</h2>
+        <p>
+          Ownlight 会保留本地内容，直到你编辑、删除、导入到空资料库，或删除 App。如果你启用 iCloud Sync，同步内容可能会保留在你的 iCloud 账号中，直到你在那里删除。导出包会保留在你保存的位置，直到你自行删除。发送到你选择的 AI provider 的内容，会按照该 provider 的政策保留。
+        </p>
+      </section>
+
+      <section>
+        <h2>删除你的数据</h2>
+        <p>
+          由于第一版没有账号，因此没有需要删除的开发者运营账号。你可以通过从 iPhone 删除 App 来删除本地 App 数据。你也需要自行删除已创建的导出包、存储在 iCloud 账号中的内容，以及发送到你自己的 AI provider 的内容。
+        </p>
+      </section>
+
+      <section>
+        <h2>联系方式</h2>
+        <p>
+          如有隐私相关问题，请联系 <a href="mailto:support@popcornnn.xyz">support@popcornnn.xyz</a>。
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

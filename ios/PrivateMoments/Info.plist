@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>$(PRIVATE_MOMENTS_IOS_DISPLAY_NAME)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>moments</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Ownlight uses the camera to capture images for moments.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Ownlight connects to your configured private endpoint for optional sync and diagnostics.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Ownlight uses the microphone to record audio moments.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Ownlight uses on-device speech recognition to create private local transcripts for AI summaries.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Ownlight uses your photo library to attach images to moments.</string>
+	<key>PrivateMomentsFallbackServerURL</key>
+	<string>$(PRIVATE_MOMENTS_FALLBACK_SERVER_URL)</string>
+	<key>PrivateMomentsPrivacyPolicyURL</key>
+	<string>$(PRIVATE_MOMENTS_PRIVACY_POLICY_URL)</string>
+	<key>PrivateMomentsPrivacyPolicyURLSimplifiedChinese</key>
+	<string>$(PRIVATE_MOMENTS_PRIVACY_POLICY_URL_ZH_HANS)</string>
+	<key>PrivateMomentsPrivacyPolicyURLEnglish</key>
+	<string>$(PRIVATE_MOMENTS_PRIVACY_POLICY_URL_EN)</string>
+	<key>PrivateMomentsSupportURL</key>
+	<string>$(PRIVATE_MOMENTS_SUPPORT_URL)</string>
+	<key>PrivateMomentsAppGroupIdentifier</key>
+	<string>$(PRIVATE_MOMENTS_IOS_APP_GROUP)</string>
+	<key>PrivateMomentsCloudKitContainerIdentifier</key>
+	<string>$(PRIVATE_MOMENTS_ICLOUD_CONTAINER_ID)</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Ownlight saves selected moment images to your photo library when you choose Save.</string>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+</dict>
+</plist>

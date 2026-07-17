@@ -1,0 +1,111 @@
+import { buildApp } from "./app.js";
+import { getAIProviderRouter } from "./ai/provider-router.js";
+import { ensureSingleUser } from "./auth/bootstrap.js";
+import { loadConfig } from "./config/app-config.js";
+import { loadEnvFile } from "./config/env-file.js";
+import { createPrismaClient } from "./db/prisma.js";
+import { FileLogger } from "./logging/file-logger.js";
+import { ArchiveScheduler } from "./maintenance/archive-scheduler.js";
+import { ExportImportService } from "./maintenance/export-import-service.js";
+import { MaintenanceJobService } from "./maintenance/maintenance-jobs.js";
+import { MaintenanceModeService } from "./maintenance/maintenance-mode.js";
+import { ResticService } from "./maintenance/restic-service.js";
+import { shouldStartLegacyReviewScheduler } from "./reviews/review-scheduler-policy.js";
+import { ReviewScheduler } from "./reviews/review-scheduler.js";
+import { ReviewService } from "./reviews/review-service.js";
+import { cleanupExpiredDeletedContent } from "./storage/cleanup.js";
+import { ensureDataDir } from "./storage/data-dir.js";
+import { ensureDefaultTags } from "./tags/tagging.js";
+
+const CLEANUP_INTERVAL_MS = 6 * 60 * 60 * 1000;
+
+async function main(): Promise<void> {
+  await loadEnvFile(".env");
+
+  const config = loadConfig();
+  const paths = await ensureDataDir(config.dataDir);
+  const fileLogger = new FileLogger(paths.logsDir);
+  const prisma = createPrismaClient(config);
+  const maintenanceMode = new MaintenanceModeService();
+  const maintenanceJobs = new MaintenanceJobService(prisma, fileLogger);
+  const restic = new ResticService(config, paths, prisma, fileLogger);
+  const exportImport = new ExportImportService(config, paths, prisma, fileLogger);
+  const archiveScheduler = new ArchiveScheduler(maintenanceJobs, restic, fileLogger);
+  const reviews = new ReviewService({ config, prisma, fileLogger });
+  const reviewScheduler = shouldStartLegacyReviewScheduler()
+    ? new ReviewScheduler(reviews, fileLogger)
+    : null;
+  const aiProviderRouter = getAIProviderRouter(config.aiSummary);
+
+  await fileLogger.info("server.starting", {
+    host: config.host,
+    port: config.port,
+    dataDir: paths.dataDir,
+  });
+
+  await ensureSingleUser(prisma, config.initialPassword, fileLogger);
+  await ensureDefaultTags(prisma, fileLogger);
+  await maintenanceJobs.markStaleRunningJobsFailed();
+  await runCleanup(prisma, paths, fileLogger);
+
+  const app = await buildApp({
+    config,
+    paths,
+    fileLogger,
+    exportImport,
+    maintenanceJobs,
+    maintenanceMode,
+    restic,
+    reviews,
+    prisma,
+  });
+  const cleanupTimer = setInterval(() => {
+    void runCleanup(prisma, paths, fileLogger);
+  }, CLEANUP_INTERVAL_MS);
+  cleanupTimer.unref();
+  aiProviderRouter.start();
+  archiveScheduler.start();
+  if (reviewScheduler) {
+    reviewScheduler.start();
+  } else {
+    await fileLogger.info("review.scheduler_disabled", {
+      reason: "iphone_direct_ai_default",
+    });
+  }
+
+  app.addHook("onClose", async () => {
+    clearInterval(cleanupTimer);
+    aiProviderRouter.stop();
+    archiveScheduler.stop();
+    reviewScheduler?.stop();
+  });
+
+  await app.listen({
+    host: config.host,
+    port: config.port,
+  });
+
+  await fileLogger.info("server.started", {
+    host: config.host,
+    port: config.port,
+  });
+}
+
+async function runCleanup(
+  prisma: ReturnType<typeof createPrismaClient>,
+  paths: Awaited<ReturnType<typeof ensureDataDir>>,
+  fileLogger: FileLogger,
+): Promise<void> {
+  try {
+    await cleanupExpiredDeletedContent(prisma, paths, fileLogger);
+  } catch (error) {
+    await fileLogger.error("cleanup.failed", {
+      message: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+}
+
+main().catch((error: unknown) => {
+  console.error(error);
+  process.exitCode = 1;
+});

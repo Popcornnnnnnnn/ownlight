@@ -1,0 +1,287 @@
+import Foundation
+
+enum SyncDoctorStatus: Equatable {
+    case allClear
+    case needsAttention
+    case blocked
+
+    var titleKey: String {
+        switch self {
+        case .allClear:
+            return "All clear"
+        case .needsAttention:
+            return "Needs attention"
+        case .blocked:
+            return "Blocked"
+        }
+    }
+}
+
+enum SyncDoctorAction: Equatable {
+    case syncNow
+    case pullServerChanges
+    case retryUploads
+    case redownloadMissingMedia
+
+    var titleKey: String {
+        switch self {
+        case .syncNow:
+            return "Sync Now"
+        case .pullServerChanges:
+            return "Pull Server Changes"
+        case .retryUploads:
+            return "Retry Uploads"
+        case .redownloadMissingMedia:
+            return "Re-download Missing Media"
+        }
+    }
+}
+
+struct SyncDoctorFinding: Equatable, Identifiable {
+    let id: String
+    let status: SyncDoctorStatus
+    let titleKey: String
+    let detailKey: String
+    let guidanceKey: String
+    let value: String?
+    let action: SyncDoctorAction?
+}
+
+struct SyncDoctorDiagnosis: Equatable {
+    let status: SyncDoctorStatus
+    let titleKey: String
+    let detailKey: String
+    let findings: [SyncDoctorFinding]
+
+    var recommendedAction: SyncDoctorAction? {
+        findings.first?.action
+    }
+
+    var recommendedGuidanceKey: String {
+        findings.first?.guidanceKey ?? detailKey
+    }
+
+    static func resolve(
+        stats: LocalStorageStats,
+        serverStatus: AdminStatusResponse?,
+        lastSyncCursor: Int,
+        isAuthenticated: Bool,
+        automaticSyncEnabled: Bool
+    ) -> SyncDoctorDiagnosis {
+        resolve(
+            stats: stats,
+            serverReachable: serverStatus != nil,
+            sync: serverStatus?.sync,
+            lastSyncCursor: lastSyncCursor,
+            isAuthenticated: isAuthenticated,
+            automaticSyncEnabled: automaticSyncEnabled
+        )
+    }
+
+    static func resolve(
+        stats: LocalStorageStats,
+        serverReachable: Bool,
+        sync: AdminSyncDiagnostics?,
+        lastSyncCursor: Int,
+        isAuthenticated: Bool,
+        automaticSyncEnabled: Bool
+    ) -> SyncDoctorDiagnosis {
+        var findings: [SyncDoctorFinding] = []
+
+        if !isAuthenticated {
+            findings.append(
+                SyncDoctorFinding(
+                    id: "not-authenticated",
+                    status: .blocked,
+                    titleKey: "Log in to sync",
+                    detailKey: "Open Settings and log in to your private sync endpoint.",
+                    guidanceKey: "Open Settings, confirm the Server URL, and log in again before trying any repair action.",
+                    value: nil,
+                    action: nil
+                )
+            )
+        }
+
+        if isAuthenticated && automaticSyncEnabled && !serverReachable {
+            findings.append(
+                SyncDoctorFinding(
+                    id: "mac-unavailable",
+                    status: .blocked,
+                    titleKey: "Sync endpoint unavailable",
+                    detailKey: "Tap Sync Now to retry. If it still fails, check the configured private endpoint or remote access URL.",
+                    guidanceKey: "Start with one Sync Now retry. If it still fails, verify the configured Server URL and that the private endpoint is reachable.",
+                    value: nil,
+                    action: .syncNow
+                )
+            )
+        }
+
+        if stats.failedUploads > 0 {
+            findings.append(
+                SyncDoctorFinding(
+                    id: "failed-uploads",
+                    status: .needsAttention,
+                    titleKey: "Uploads need retry",
+                    detailKey: "Failed media uploads are waiting on this iPhone.",
+                    guidanceKey: "Use Retry Uploads first. This only retries failed media and does not delete the local copy.",
+                    value: "\(stats.failedUploads)",
+                    action: .retryUploads
+                )
+            )
+        }
+
+        if let sync, hasCurrentRejectedSyncWork(stats: stats, sync: sync) {
+            findings.append(
+                SyncDoctorFinding(
+                    id: "rejected-operations",
+                    status: .blocked,
+                    titleKey: "Server rejected sync work",
+                    detailKey: "Check Sync Health and Mac logs before retrying rejected sync work.",
+                    guidanceKey: "Do not retry blindly. Inspect Sync Health and Mac logs first so you know what the server rejected.",
+                    value: "\(sync.rejectedOperations ?? 0)",
+                    action: nil
+                )
+            )
+        }
+
+        if stats.pendingChanges > 0 || stats.pendingUploads > 0 {
+            findings.append(
+                SyncDoctorFinding(
+                    id: "pending-work",
+                    status: .needsAttention,
+                    titleKey: "Sync work is waiting",
+                    detailKey: "This iPhone has local changes or media uploads waiting to sync.",
+                    guidanceKey: "Tap Sync Now to flush local changes and uploads from this iPhone.",
+                    value: "\(stats.pendingChanges + stats.pendingUploads)",
+                    action: .syncNow
+                )
+            )
+        }
+
+        if let sync, sync.latestServerChangeVersion > lastSyncCursor {
+            findings.append(
+                SyncDoctorFinding(
+                    id: "remote-behind",
+                    status: .needsAttention,
+                    titleKey: "This iPhone is behind",
+                    detailKey: "Your Mac has newer changes than this iPhone.",
+                    guidanceKey: "Use Pull Server Changes when the Mac change version is ahead and you only need remote updates.",
+                    value: "\(sync.latestServerChangeVersion - lastSyncCursor)",
+                    action: .pullServerChanges
+                )
+            )
+        }
+
+        if stats.missingMediaDownloads > 0 {
+            findings.append(
+                SyncDoctorFinding(
+                    id: "missing-media",
+                    status: .needsAttention,
+                    titleKey: "Media needs re-download",
+                    detailKey: "Some uploaded media is missing locally and can be downloaded again.",
+                    guidanceKey: "Use Re-download Missing Media to restore local cache copies without changing timeline content.",
+                    value: "\(stats.missingMediaDownloads)",
+                    action: .redownloadMissingMedia
+                )
+            )
+        }
+
+        if let failedMediaUploads = sync?.failedMediaUploads, failedMediaUploads > 0 {
+            findings.append(
+                SyncDoctorFinding(
+                    id: "server-failed-media",
+                    status: .needsAttention,
+                    titleKey: "Mac media uploads need inspection",
+                    detailKey: "The Mac reports failed media uploads. Check Sync Health and Mac logs before retrying.",
+                    guidanceKey: "Inspect Mac-side media failures first. Retrying from the iPhone is low-value until the Mac-side problem is understood.",
+                    value: "\(failedMediaUploads)",
+                    action: nil
+                )
+            )
+        }
+
+        if let aiNonReady = sync?.aiNonReady, aiNonReady > 0 {
+            findings.append(
+                SyncDoctorFinding(
+                    id: "ai-not-ready",
+                    status: .needsAttention,
+                    titleKey: "AI summaries still running",
+                    detailKey: "AI summaries are still processing on the Mac. This does not block sync.",
+                    guidanceKey: "Wait unless this stays stuck for an unusually long time. AI processing here is informational, not a sync blocker.",
+                    value: "\(aiNonReady)",
+                    action: nil
+                )
+            )
+        }
+
+        if isAuthenticated && !automaticSyncEnabled {
+            findings.append(
+                SyncDoctorFinding(
+                    id: "local-only",
+                    status: .needsAttention,
+                    titleKey: "Local-only mode",
+                    detailKey: "Automatic Sync is off. New work stays on this iPhone until you tap Sync Now or turn it back on.",
+                    guidanceKey: "If local-only mode is intentional, leave it alone. Otherwise tap Sync Now before switching devices or re-enable Automatic Sync.",
+                    value: nil,
+                    action: hasPendingWork(stats) ? .syncNow : nil
+                )
+            )
+        }
+
+        guard let primaryFinding = findings.first else {
+            return SyncDoctorDiagnosis(
+                status: .allClear,
+                titleKey: "All clear",
+                detailKey: "No sync problems found.",
+                findings: []
+            )
+        }
+
+        return SyncDoctorDiagnosis(
+            status: primaryFinding.status,
+            titleKey: primaryFinding.titleKey,
+            detailKey: primaryFinding.detailKey,
+            findings: findings
+        )
+    }
+
+    private static func hasPendingWork(_ stats: LocalStorageStats) -> Bool {
+        stats.pendingChanges > 0 || stats.pendingUploads > 0 || stats.failedUploads > 0
+    }
+
+    private static func hasCurrentRejectedSyncWork(stats: LocalStorageStats, sync: AdminSyncDiagnostics) -> Bool {
+        guard let rejectedOperations = sync.rejectedOperations, rejectedOperations > 0 else {
+            return false
+        }
+
+        guard stats.pendingChanges > 0 || (sync.pendingOperations ?? 0) > 0 else {
+            return false
+        }
+
+        guard let lastRejectedSyncAt = parseAdminTimestamp(sync.lastRejectedSyncAt) else {
+            return false
+        }
+
+        guard let lastSuccessfulSyncAt = parseAdminTimestamp(sync.lastSuccessfulSyncAt) else {
+            return true
+        }
+
+        return lastRejectedSyncAt > lastSuccessfulSyncAt
+    }
+
+    private static func parseAdminTimestamp(_ value: String?) -> Date? {
+        guard let value else {
+            return nil
+        }
+
+        let fractionalFormatter = ISO8601DateFormatter()
+        fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = fractionalFormatter.date(from: value) {
+            return date
+        }
+
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter.date(from: value)
+    }
+}

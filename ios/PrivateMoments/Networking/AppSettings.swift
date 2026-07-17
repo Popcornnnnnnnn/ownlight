@@ -1,0 +1,684 @@
+import Foundation
+import SwiftUI
+
+enum AppAppearanceMode: String, CaseIterable, Identifiable {
+    case system
+    case light
+    case dark
+
+    var id: String {
+        rawValue
+    }
+
+    var title: String {
+        switch self {
+        case .system:
+            return "System"
+        case .light:
+            return "Light"
+        case .dark:
+            return "Dark"
+        }
+    }
+
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system:
+            return nil
+        case .light:
+            return .light
+        case .dark:
+            return .dark
+        }
+    }
+}
+
+enum TranscriptionProviderMode: String, CaseIterable, Identifiable, Codable {
+    case iPhoneOnDevice = "iphone_on_device"
+    case localGateway = "local_gateway"
+    case customOpenAICompatible = "custom_openai_compatible"
+
+    static var allCases: [TranscriptionProviderMode] {
+        [.iPhoneOnDevice, .customOpenAICompatible]
+    }
+
+    var id: String {
+        rawValue
+    }
+
+    var titleKey: String {
+        switch self {
+        case .iPhoneOnDevice:
+            return "iPhone On-device"
+        case .localGateway:
+            return "OpenAI-compatible Endpoint"
+        case .customOpenAICompatible:
+            return "OpenAI-compatible Endpoint"
+        }
+    }
+
+    var isExternalProvider: Bool {
+        self != .iPhoneOnDevice
+    }
+
+    var systemImage: String {
+        switch self {
+        case .iPhoneOnDevice:
+            return "iphone"
+        case .localGateway:
+            return "network"
+        case .customOpenAICompatible:
+            return "network"
+        }
+    }
+
+    var normalizedForSettingsUI: TranscriptionProviderMode {
+        switch self {
+        case .localGateway:
+            return .customOpenAICompatible
+        case .iPhoneOnDevice, .customOpenAICompatible:
+            return self
+        }
+    }
+}
+
+struct LocalTranscriptionGatewaySettings: Codable, Equatable {
+    static let defaultModel = "mlx-community/whisper-large-v3-turbo"
+    static let `default` = LocalTranscriptionGatewaySettings(urlString: "", model: defaultModel)
+
+    var urlString: String
+    var model: String
+
+    var normalizedURLString: String {
+        urlString.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    var normalizedModel: String {
+        let trimmed = model.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? Self.defaultModel : trimmed
+    }
+}
+
+enum AppSettings {
+    private enum Keys {
+        static let serverURLString = "serverURLString"
+        static let deviceId = "deviceId"
+        static let deviceKey = "deviceKey"
+        static let lastSyncCursor = "lastSyncCursor"
+        static let didApplySyncRecoveryV1 = "didApplySyncRecoveryV1"
+        static let lastMediaDownloadError = "lastMediaDownloadError"
+        static let showTagsInTimeline = "showTagsInTimeline"
+        static let showCheckInSummaries = "showCheckInSummaries"
+        static let memoryLinksEnabled = "memoryLinksEnabled"
+        static let aiTitleAutoInsertEnabled = "aiTitleAutoInsertEnabled"
+        static let aiTitleAutoInsertCutoff = "aiTitleAutoInsertCutoff"
+        static let appAppearanceMode = "appAppearanceMode"
+        static let appLanguageMode = "appLanguageMode"
+        static let aiLanguageMode = "aiLanguageMode"
+        static let aiAnalysisEnabled = "aiAnalysisEnabled"
+        static let aiExternalProcessingConsentAccepted = "aiExternalProcessingConsentAccepted"
+        static let aiProviderProfiles = "aiProviderProfiles"
+        static let aiProviderFallbackState = "aiProviderFallbackState"
+        static let useTextProviderForTranscription = "useTextProviderForTranscription"
+        static let preferredSpeechTranscriptionLocaleIdentifier = "preferredSpeechTranscriptionLocaleIdentifier"
+        static let transcriptionProviderMode = "transcriptionProviderMode"
+        static let localTranscriptionGatewaySettings = "localTranscriptionGatewaySettings"
+        static let automaticSyncEnabled = "automaticSyncEnabled"
+        static let autoWeeklyReviewEnabled = "autoWeeklyReviewEnabled"
+        static let publishWeeklyReviewToMoments = "publishWeeklyReviewToMoments"
+        static let localWeeklyReviews = "localWeeklyReviews"
+        static let lastReachableServerURLString = "lastReachableServerURLString"
+        static let welcomeOnboardingShown = "welcomeOnboardingShown"
+        static let welcomeSampleDeleted = "welcomeSampleDeleted"
+        static let welcomeGestureHintShown = "welcomeGestureHintShown"
+        static let markdownMathRenderingEnabled = "markdownMathRenderingEnabled"
+        static let markdownRemoteImagesEnabled = "markdownRemoteImagesEnabled"
+        static let markdownRawHTMLRenderingEnabled = "markdownRawHTMLRenderingEnabled"
+        static let iCloudSyncEnabled = "iCloudSyncEnabled"
+        static let cloudKitSmokeTestPostId = "cloudKitSmokeTestPostId"
+    }
+
+    enum KeysForTesting {
+        static let markdownMathRenderingEnabled = Keys.markdownMathRenderingEnabled
+        static let markdownRemoteImagesEnabled = Keys.markdownRemoteImagesEnabled
+        static let markdownRawHTMLRenderingEnabled = Keys.markdownRawHTMLRenderingEnabled
+        static let iCloudSyncEnabled = Keys.iCloudSyncEnabled
+        static let cloudKitSmokeTestPostId = Keys.cloudKitSmokeTestPostId
+    }
+
+    private static let fallbackServerURLInfoKey = "PrivateMomentsFallbackServerURL"
+
+    static var serverURLString: String {
+        get {
+            UserDefaults.standard.string(forKey: Keys.serverURLString) ?? "http://127.0.0.1:3210"
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.serverURLString)
+        }
+    }
+
+    static var bundledFallbackServerURLString: String? {
+        guard let value = Bundle.main.object(forInfoDictionaryKey: fallbackServerURLInfoKey) as? String else {
+            return nil
+        }
+
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, !trimmed.contains("$(") else {
+            return nil
+        }
+
+        return trimmed
+    }
+
+    static var lastReachableServerURLString: String? {
+        get {
+            UserDefaults.standard.string(forKey: Keys.lastReachableServerURLString)
+        }
+        set {
+            if let newValue, !newValue.isEmpty {
+                UserDefaults.standard.set(newValue, forKey: Keys.lastReachableServerURLString)
+            } else {
+                UserDefaults.standard.removeObject(forKey: Keys.lastReachableServerURLString)
+            }
+        }
+    }
+
+    static func rememberReachableServerURL(_ url: URL) {
+        lastReachableServerURLString = url.absoluteString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+    }
+
+    static func serverURLCandidateStrings(
+        primary: String = AppSettings.serverURLString,
+        preferLastReachable: Bool = false
+    ) -> [String] {
+        var candidates: [String] = []
+        let orderedValues: [String?] = preferLastReachable
+            ? [lastReachableServerURLString, primary, bundledFallbackServerURLString]
+            : [primary, bundledFallbackServerURLString]
+
+        for value in orderedValues.compactMap({ $0 }) {
+            let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else {
+                continue
+            }
+
+            let comparable = trimmed.trimmingCharacters(in: CharacterSet(charactersIn: "/")).lowercased()
+            if !candidates.contains(where: {
+                $0.trimmingCharacters(in: CharacterSet(charactersIn: "/")).lowercased() == comparable
+            }) {
+                candidates.append(trimmed)
+            }
+        }
+
+        return candidates
+    }
+
+    static var deviceId: String? {
+        get {
+            UserDefaults.standard.string(forKey: Keys.deviceId)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.deviceId)
+        }
+    }
+
+    static func deviceKey(preferred: String?) -> String {
+        if let existing = UserDefaults.standard.string(forKey: Keys.deviceKey), !existing.isEmpty {
+            return existing
+        }
+
+        let preferredKey = preferred?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let key: String
+        if let preferredKey, !preferredKey.isEmpty {
+            key = preferredKey
+        } else {
+            key = UUID().uuidString
+        }
+
+        UserDefaults.standard.set(key, forKey: Keys.deviceKey)
+        return key
+    }
+
+    static var lastSyncCursor: Int {
+        get {
+            UserDefaults.standard.integer(forKey: Keys.lastSyncCursor)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.lastSyncCursor)
+        }
+    }
+
+    static var didApplySyncRecoveryV1: Bool {
+        get {
+            UserDefaults.standard.bool(forKey: Keys.didApplySyncRecoveryV1)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.didApplySyncRecoveryV1)
+        }
+    }
+
+    static var lastMediaDownloadError: String? {
+        get {
+            UserDefaults.standard.string(forKey: Keys.lastMediaDownloadError)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.lastMediaDownloadError)
+        }
+    }
+
+    static var showTagsInTimeline: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: Keys.showTagsInTimeline) == nil {
+                return true
+            }
+
+            return UserDefaults.standard.bool(forKey: Keys.showTagsInTimeline)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.showTagsInTimeline)
+        }
+    }
+
+    static var showCheckInSummaries: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: Keys.showCheckInSummaries) == nil {
+                return true
+            }
+
+            return UserDefaults.standard.bool(forKey: Keys.showCheckInSummaries)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.showCheckInSummaries)
+        }
+    }
+
+    static var memoryLinksEnabled: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: Keys.memoryLinksEnabled) == nil {
+                return true
+            }
+
+            return UserDefaults.standard.bool(forKey: Keys.memoryLinksEnabled)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.memoryLinksEnabled)
+        }
+    }
+
+    static var aiTitleAutoInsertEnabled: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: Keys.aiTitleAutoInsertEnabled) == nil {
+                return true
+            }
+
+            return UserDefaults.standard.bool(forKey: Keys.aiTitleAutoInsertEnabled)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.aiTitleAutoInsertEnabled)
+        }
+    }
+
+    static var aiTitleAutoInsertCutoff: Date {
+        let storedValue = UserDefaults.standard.double(forKey: Keys.aiTitleAutoInsertCutoff)
+        if storedValue > 0 {
+            return Date(timeIntervalSince1970: storedValue)
+        }
+
+        let now = Date()
+        UserDefaults.standard.set(now.timeIntervalSince1970, forKey: Keys.aiTitleAutoInsertCutoff)
+        return now
+    }
+
+    static func ensureAITitleAutoInsertCutoff() {
+        _ = aiTitleAutoInsertCutoff
+    }
+
+    static var appAppearanceMode: AppAppearanceMode {
+        get {
+            guard let rawValue = UserDefaults.standard.string(forKey: Keys.appAppearanceMode),
+                  let mode = AppAppearanceMode(rawValue: rawValue) else {
+                return .system
+            }
+
+            return mode
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: Keys.appAppearanceMode)
+        }
+    }
+
+    static var appLanguageMode: AppLanguageMode {
+        get {
+            if let rawValue = UserDefaults.standard.string(forKey: Keys.appLanguageMode),
+               let mode = AppLanguageMode(rawValue: rawValue) {
+                return mode
+            }
+
+            let initialMode: AppLanguageMode = hasExistingInstallSignals ? .english : .system
+            UserDefaults.standard.set(initialMode.rawValue, forKey: Keys.appLanguageMode)
+            return initialMode
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: Keys.appLanguageMode)
+        }
+    }
+
+    static var aiLanguageMode: AILanguageMode {
+        get {
+            guard let rawValue = UserDefaults.standard.string(forKey: Keys.aiLanguageMode),
+                  let mode = AILanguageMode(rawValue: rawValue) else {
+                return .auto
+            }
+
+            return mode
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: Keys.aiLanguageMode)
+        }
+    }
+
+    static var aiAnalysisEnabled: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: Keys.aiAnalysisEnabled) == nil {
+                return false
+            }
+
+            return UserDefaults.standard.bool(forKey: Keys.aiAnalysisEnabled)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.aiAnalysisEnabled)
+        }
+    }
+
+    static var aiExternalProcessingConsentAccepted: Bool {
+        get {
+            UserDefaults.standard.bool(forKey: Keys.aiExternalProcessingConsentAccepted)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.aiExternalProcessingConsentAccepted)
+        }
+    }
+
+    static var welcomeOnboardingShown: Bool {
+        get {
+            UserDefaults.standard.bool(forKey: Keys.welcomeOnboardingShown)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.welcomeOnboardingShown)
+        }
+    }
+
+    static var welcomeSampleDeleted: Bool {
+        get {
+            UserDefaults.standard.bool(forKey: Keys.welcomeSampleDeleted)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.welcomeSampleDeleted)
+        }
+    }
+
+    static var welcomeGestureHintShown: Bool {
+        get {
+            UserDefaults.standard.bool(forKey: Keys.welcomeGestureHintShown)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.welcomeGestureHintShown)
+        }
+    }
+
+    static var aiProviderProfiles: [AIProviderProfile] {
+        get {
+            guard let data = UserDefaults.standard.data(forKey: Keys.aiProviderProfiles),
+                  let profiles = try? JSONDecoder().decode([AIProviderProfile].self, from: data) else {
+                return []
+            }
+
+            return profiles
+        }
+        set {
+            if let data = try? JSONEncoder().encode(newValue) {
+                UserDefaults.standard.set(data, forKey: Keys.aiProviderProfiles)
+            }
+        }
+    }
+
+    static var aiProviderFallbackState: AIProviderFallbackState {
+        get {
+            guard let data = UserDefaults.standard.data(forKey: Keys.aiProviderFallbackState),
+                  var state = try? JSONDecoder().decode(AIProviderFallbackState.self, from: data) else {
+                return AIProviderFallbackState()
+            }
+
+            if state.clearLegacyArtifactGenerationNeedsAttentionRecords(),
+               let data = try? JSONEncoder().encode(state) {
+                UserDefaults.standard.set(data, forKey: Keys.aiProviderFallbackState)
+            }
+
+            return state
+        }
+        set {
+            if let data = try? JSONEncoder().encode(newValue) {
+                UserDefaults.standard.set(data, forKey: Keys.aiProviderFallbackState)
+            }
+        }
+    }
+
+    static var useTextProviderForTranscription: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: Keys.useTextProviderForTranscription) == nil {
+                return false
+            }
+
+            return UserDefaults.standard.bool(forKey: Keys.useTextProviderForTranscription)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.useTextProviderForTranscription)
+        }
+    }
+
+    static var preferredSpeechTranscriptionLocaleIdentifier: String? {
+        get {
+            UserDefaults.standard.string(forKey: Keys.preferredSpeechTranscriptionLocaleIdentifier)
+        }
+        set {
+            let trimmed = newValue?.trimmingCharacters(in: .whitespacesAndNewlines)
+            if let trimmed, !trimmed.isEmpty {
+                UserDefaults.standard.set(trimmed, forKey: Keys.preferredSpeechTranscriptionLocaleIdentifier)
+            } else {
+                UserDefaults.standard.removeObject(forKey: Keys.preferredSpeechTranscriptionLocaleIdentifier)
+            }
+        }
+    }
+
+    static var transcriptionProviderMode: TranscriptionProviderMode {
+        get {
+            guard let rawValue = UserDefaults.standard.string(forKey: Keys.transcriptionProviderMode),
+                  let mode = TranscriptionProviderMode(rawValue: rawValue) else {
+                return .iPhoneOnDevice
+            }
+
+            let normalized = mode.normalizedForSettingsUI
+            if normalized != mode {
+                UserDefaults.standard.set(normalized.rawValue, forKey: Keys.transcriptionProviderMode)
+            }
+            return normalized
+        }
+        set {
+            UserDefaults.standard.set(newValue.normalizedForSettingsUI.rawValue, forKey: Keys.transcriptionProviderMode)
+        }
+    }
+
+    static var localTranscriptionGatewaySettings: LocalTranscriptionGatewaySettings {
+        get {
+            guard let data = UserDefaults.standard.data(forKey: Keys.localTranscriptionGatewaySettings),
+                  let settings = try? JSONDecoder().decode(LocalTranscriptionGatewaySettings.self, from: data) else {
+                return .default
+            }
+
+            return LocalTranscriptionGatewaySettings(
+                urlString: settings.urlString.trimmingCharacters(in: .whitespacesAndNewlines),
+                model: settings.normalizedModel
+            )
+        }
+        set {
+            let normalized = LocalTranscriptionGatewaySettings(
+                urlString: newValue.urlString.trimmingCharacters(in: .whitespacesAndNewlines),
+                model: newValue.normalizedModel
+            )
+            if let data = try? JSONEncoder().encode(normalized) {
+                UserDefaults.standard.set(data, forKey: Keys.localTranscriptionGatewaySettings)
+            }
+        }
+    }
+
+    static var automaticSyncEnabled: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: Keys.automaticSyncEnabled) == nil {
+                return true
+            }
+
+            return UserDefaults.standard.bool(forKey: Keys.automaticSyncEnabled)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.automaticSyncEnabled)
+        }
+    }
+
+    static var autoWeeklyReviewEnabled: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: Keys.autoWeeklyReviewEnabled) == nil {
+                return false
+            }
+
+            return UserDefaults.standard.bool(forKey: Keys.autoWeeklyReviewEnabled)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.autoWeeklyReviewEnabled)
+        }
+    }
+
+    static var publishWeeklyReviewToMoments: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: Keys.publishWeeklyReviewToMoments) == nil {
+                return false
+            }
+
+            return UserDefaults.standard.bool(forKey: Keys.publishWeeklyReviewToMoments)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.publishWeeklyReviewToMoments)
+        }
+    }
+
+    static var localWeeklyReviews: [ReviewPayload] {
+        get {
+            guard let data = UserDefaults.standard.data(forKey: Keys.localWeeklyReviews),
+                  let reviews = try? JSONDecoder().decode([ReviewPayload].self, from: data) else {
+                return []
+            }
+
+            return reviews
+        }
+        set {
+            if let data = try? JSONEncoder().encode(newValue) {
+                UserDefaults.standard.set(data, forKey: Keys.localWeeklyReviews)
+            }
+        }
+    }
+
+    static var markdownMathRenderingEnabled: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: Keys.markdownMathRenderingEnabled) == nil {
+                return true
+            }
+
+            return UserDefaults.standard.bool(forKey: Keys.markdownMathRenderingEnabled)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.markdownMathRenderingEnabled)
+        }
+    }
+
+    static var markdownRemoteImagesEnabled: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: Keys.markdownRemoteImagesEnabled) == nil {
+                return false
+            }
+
+            return UserDefaults.standard.bool(forKey: Keys.markdownRemoteImagesEnabled)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.markdownRemoteImagesEnabled)
+        }
+    }
+
+    static var markdownRawHTMLRenderingEnabled: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: Keys.markdownRawHTMLRenderingEnabled) == nil {
+                return false
+            }
+
+            return UserDefaults.standard.bool(forKey: Keys.markdownRawHTMLRenderingEnabled)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.markdownRawHTMLRenderingEnabled)
+        }
+    }
+
+    static var iCloudSyncEnabled: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: Keys.iCloudSyncEnabled) == nil {
+                return false
+            }
+
+            return UserDefaults.standard.bool(forKey: Keys.iCloudSyncEnabled)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.iCloudSyncEnabled)
+        }
+    }
+
+    static var hasExplicitICloudSyncPreference: Bool {
+        UserDefaults.standard.object(forKey: Keys.iCloudSyncEnabled) != nil
+    }
+
+    @discardableResult
+    static func restoreICloudSyncOptInIfMissing(hasCloudKitHistory: Bool) -> Bool {
+        guard !hasExplicitICloudSyncPreference, hasCloudKitHistory else {
+            return false
+        }
+
+        iCloudSyncEnabled = true
+        return true
+    }
+
+    static var cloudKitSmokeTestPostId: String? {
+        get {
+            UserDefaults.standard.string(forKey: Keys.cloudKitSmokeTestPostId)
+        }
+        set {
+            let trimmed = newValue?.trimmingCharacters(in: .whitespacesAndNewlines)
+            if let trimmed, !trimmed.isEmpty {
+                UserDefaults.standard.set(trimmed, forKey: Keys.cloudKitSmokeTestPostId)
+            } else {
+                UserDefaults.standard.removeObject(forKey: Keys.cloudKitSmokeTestPostId)
+            }
+        }
+    }
+
+    static func clearSession() {
+        UserDefaults.standard.removeObject(forKey: Keys.deviceId)
+        UserDefaults.standard.removeObject(forKey: Keys.lastSyncCursor)
+        UserDefaults.standard.removeObject(forKey: Keys.lastReachableServerURLString)
+    }
+
+    private static var hasExistingInstallSignals: Bool {
+        UserDefaults.standard.object(forKey: Keys.deviceId) != nil
+            || UserDefaults.standard.object(forKey: Keys.serverURLString) != nil
+            || UserDefaults.standard.object(forKey: Keys.lastSyncCursor) != nil
+            || UserDefaults.standard.object(forKey: Keys.showTagsInTimeline) != nil
+            || UserDefaults.standard.object(forKey: Keys.showCheckInSummaries) != nil
+            || UserDefaults.standard.object(forKey: Keys.appAppearanceMode) != nil
+            || UserDefaults.standard.object(forKey: Keys.aiTitleAutoInsertEnabled) != nil
+    }
+}

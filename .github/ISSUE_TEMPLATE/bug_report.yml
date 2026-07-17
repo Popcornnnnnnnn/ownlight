@@ -1,0 +1,43 @@
+name: Bug report
+description: Report a reproducible Ownlight problem without private content.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not attach private timeline content, media, credentials, or device logs containing personal data.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open...\n2. Tap...\n3. Observe..."
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Ownlight version
+      placeholder: "1.1 (4)"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Device and iOS version
+      placeholder: "iPhone 15, iOS 18.5"
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I removed private content, credentials, and identifying device data from this report.
+          required: true
