@@ -18,10 +18,11 @@ Last updated: 2026-07-17
 - iOS 公开默认 identifiers 已迁移到 `ios/Config/Public.xcconfig`，本地 override 由 ignored 的 `ios/Config/Local.xcconfig` 承载。
 - `.gitignore` 已覆盖 `server/.env`、`server/data/`、`server/.venv/`、`server/dist/`、`admin/dist/`、`ios/build*`、`ios/PrivateMoments.xcodeproj/`、`node_modules/`、`.tmp/` 等运行时或生成内容。
 - 文档已经覆盖产品定位、技术设计、操作 runbook、integration guide、design principles、workflow 和 handoff。
-- README 通过可重复 simulator demo fixture 维护 6 张公开截图：Timeline、Detail、Calendar、Check-ins、Settings 和 Tags。
+- README 通过可重复 simulator demo fixture 维护 6 张英文公开截图：Timeline、AI Summary、Markdown Detail、Calendar Review、Topic Areas 和 iCloud Sync。
 - 当时的 legacy server-side AI media summary provider credential 设计为只存在 Mac server 环境变量中；当前 App Store / iPhone-first 路径改为用户在 iPhone Settings > AI & Analysis 配置 provider，API key 存在 iPhone Keychain。
 - 2026-07-17 公开策略改为 clean snapshot：只把当前已审计 checkout 写入新的 public repository，不复用旧 private repository 的 Git history。
 - 2026-07-17 已发布 MIT source-only `v1.1.0` GitHub Release。公开仓库 source 与 iOS GitHub Actions jobs 均通过；iOS job 使用 Xcode 16.4 generic-device build 验证 clean checkout，同时源码继续兼容当前 Xcode 26 SDK。
+- 2026-07-17 公开 README 已升级为 product-first 首页：首屏包含 App icon、App Store 下载入口、latest source release、CI/iOS/SwiftUI/MIT 状态；6 张英文截图按产品能力编排；隐私边界、源码构建和 legacy workspace 分层展示。GitHub Release 说明也应保持 App Store 与 source-only 两条获取路径清晰可见。
 
 ## 持续维护风险
 
