@@ -109,10 +109,20 @@ final class AudioRecorderController: NSObject, ObservableObject, AVAudioRecorder
     private func startRecordingAfterPermission() {
         do {
             let session = AVAudioSession.sharedInstance()
+            var categoryOptions: AVAudioSession.CategoryOptions = [
+                .defaultToSpeaker,
+                .allowBluetoothA2DP,
+                .mixWithOthers
+            ]
+#if compiler(>=6.2)
+            categoryOptions.insert(.allowBluetoothHFP)
+#else
+            categoryOptions.insert(.allowBluetooth)
+#endif
             try session.setCategory(
                 .playAndRecord,
                 mode: .default,
-                options: [.defaultToSpeaker, .allowBluetoothHFP, .allowBluetoothA2DP, .mixWithOthers]
+                options: categoryOptions
             )
             try session.setActive(true)
 
